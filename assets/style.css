@@ -58,6 +58,7 @@ button {
 .cell-table tr td {
     width: 100px !important;
     min-width: 100px !important;
+    max-width: 200px !important;
     text-align: left !important;
     padding-left: 10px !important;
     padding-right: 10px !important;

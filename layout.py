@@ -42,6 +42,7 @@ def serve_layout():
             dbc.Row([
                 dash_table.DataTable(id="database-table", data=None),
             ]),
+            dcc.Store(id="database-store", data=None, storage_type="session"),
         ]),
         dbc.Container([
             dbc.Row([
@@ -49,6 +50,11 @@ def serve_layout():
             ]),
             dbc.Row([
                 dash_table.DataTable(id="new-entries-table", data=None),
+            ]),
+            dcc.Store(id="new-entries-store", data=None, storage_type="session"),
+            dbc.Row([
+                dbc.Button("Commit Changes", id="commit-changes", color="primary", n_clicks=0),
+                dbc.Button("Clear Changes", id="clear-changes", color="secondary", n_clicks=0),
             ]),
         ]),
     ]

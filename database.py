@@ -14,7 +14,7 @@ taperunner_columns = [
 ]
 
 
-def get_empty_database_df(rows=1, columns=1, header_text="Empty", cell_text="No data"):
+def get_dummy_df(rows=1, columns=1, header_text="Empty", cell_text="No data"):
     return pd.DataFrame({f"{header_text} {i}": [cell_text]*rows for i in range(columns)})
 
 
@@ -36,6 +36,8 @@ def initialize_database(db_file=None, table_name=None, columns=None):
 
     if columns is None:
         columns = [column for column in taperunner_columns]
+        
+    columns.insert(0, "id INTEGER PRIMARY KEY AUTOINCREMENT")
 
     conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
