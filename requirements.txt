@@ -1,0 +1,6 @@
+pandas
+numpy
+dash
+dash-bootstrap-components
+dash-table
+flask
