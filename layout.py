@@ -43,5 +43,13 @@ def serve_layout():
                 dash_table.DataTable(id="database-table", data=None),
             ]),
         ]),
+        dbc.Container([
+            dbc.Row([
+                html.H2("New Entries"),
+            ]),
+            dbc.Row([
+                dash_table.DataTable(id="new-entries-table", data=None),
+            ]),
+        ]),
     ]
     return layout
