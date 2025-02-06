@@ -30,6 +30,10 @@ def serve_layout():
                     dbc.Row(dcc.Input(id="input-6", type="text", value="", placeholder="Enter input 6", debounce=True)),
                 ]),
             ]),
+            dbc.Row([
+                dbc.Button("Add to Database", id="add-to-db", color="primary", n_clicks=0),
+                dbc.Button("Clear Inputs", id="clear-inputs", color="secondary", n_clicks=0),
+            ]),
         ]),
         dbc.Container([
             dbc.Row([

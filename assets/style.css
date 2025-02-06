@@ -33,6 +33,10 @@ input {
     text-overflow: ellipsis !important;
 }
 
+button {
+    margin: 10px !important;
+}
+
 .dash-table-container {
     padding: 20px !important;
     max-height: 500px !important;
