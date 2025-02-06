@@ -1,0 +1,79 @@
+.container {
+    margin-bottom: 10px !important;
+    max-width: 90% !important;
+}
+
+h1 {
+    margin-bottom: 10px !important;
+}
+
+h2 {
+    margin-top: 10px !important;
+}
+
+.row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+}
+
+.col {
+    margin-right: 10px !important;
+    width: 200px !important;
+    max-width: 200px !important;
+}
+
+label {
+    font-weight: bold !important;
+    width: 100% !important;
+}
+
+input {
+    margin-bottom: 10px !important;
+    width: 100% !important;
+    text-overflow: ellipsis !important;
+}
+
+.dash-table-container {
+    padding: 20px !important;
+    max-height: 500px !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    display: block !important;
+}
+
+.cell-table {
+    table-layout: fixed !important;
+}
+
+.cell-table tr th {
+    font-weight: bold !important;
+    white-space: normal !important;
+}
+
+.cell-table tr th, 
+.cell-table tr td {
+    width: 100px !important;
+    min-width: 100px !important;
+    text-align: left !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    overflow: hidden !important;
+    border: rgba(100, 100, 100, 25%) solid 1px !important;
+}
+
+.cell-table tr td {
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    background-color: transparent !important;
+}
+
+.cell-table tr:hover td {
+    overflow: visible !important;
+    white-space: normal !important;
+    word-break: break-all !important;
+    height: auto !important;
+}
+
+.cell-table tr:not(:first-child):hover {
+    border: darkgray 5px solid !important;
+}

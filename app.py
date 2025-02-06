@@ -8,6 +8,7 @@ callbacks.register_callbacks(app)
 
 
 def main():
+    database.initialize_database()
     app.run_server(debug=True, port=5000)
 
 
