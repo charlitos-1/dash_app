@@ -5,8 +5,21 @@ import database
 
 
 def serve_column_defs(columns):
-    column_defs = [{"field": column} for column in columns]
+    column_defs = [{"field": column, "headerTooltip": column, "tooltipField": column} for column in columns]
     return column_defs
+
+
+def serve_dash_grid_options():
+    grid_options = {
+        "enableSorting": False,
+        "enableColResize": True,
+        "animateRows": True,
+        "pagination": True,
+        "paginationPageSize": 50,
+        "paginationPageSizeSelector": False,
+        "tooltipShowDelay": 100,
+    }
+    return grid_options
 
 
 def serve_layout():
@@ -49,7 +62,7 @@ def serve_layout():
                 html.H2("Database"),
             ]),
             dbc.Row([
-                dag.AgGrid(id="database-table", rowData=None, columnDefs=None),
+                dag.AgGrid(id="database-table", rowData=None, columnDefs=None, dashGridOptions=serve_dash_grid_options()),
             ]),
             dcc.Store(id="database-store", data=[], storage_type="session"),
         ]),
@@ -58,7 +71,7 @@ def serve_layout():
                 html.H2("New Entries"),
             ]),
             dbc.Row([
-                dag.AgGrid(id="new-entries-table", rowData=None, columnDefs=None),
+                dag.AgGrid(id="new-entries-table", rowData=None, columnDefs=None, dashGridOptions=serve_dash_grid_options()),
             ]),
             dcc.Store(id="new-entries-store", data=[], storage_type="session"),
             dbc.Row([
