@@ -90,5 +90,13 @@ def register_callbacks(app):
         new_entries_store = None
 
         return database_store, new_entries_store
+    
+    @app.callback(
+        Output("new-entries-store", "data"),
+        Input("clear-changes", "n_clicks"),
+        prevent_initial_call=True
+    )
+    def clear_changes(n_clicks):
+        return []
 
     pass
