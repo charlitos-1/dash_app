@@ -39,27 +39,39 @@ def register_callbacks(app):
         Output(component_id="input-4", component_property="value", allow_duplicate=True),
         Output(component_id="input-5", component_property="value", allow_duplicate=True),
         Output(component_id="input-6", component_property="value", allow_duplicate=True),
-        Input("clear-inputs", "n_clicks"),
+        Output(component_id="clear-inputs-flag", component_property="data", allow_duplicate=True),
+        Input(component_id="clear-inputs-flag", component_property="data"),
         prevent_initial_call=True,
     )
-    def clear_inputs(n_clicks):
-        return "", "", "", "", "", ""
+    def clear_inputs(clear_inputs_flag):
+        if clear_inputs_flag:
+            return "", "", "", "", "", "", 0
+        return no_update, no_update, no_update, no_update, no_update, no_update, no_update
     
     @app.callback(
-        Output("new-entries-store", "data", allow_duplicate=True),
-        Input("add-to-db", "n_clicks"),
-        State("input-1", "value"),
-        State("input-2", "value"),
-        State("input-3", "value"),
-        State("input-4", "value"),
-        State("input-5", "value"),
-        State("input-6", "value"),
-        State("new-entries-store", "data"),
+        Output(component_id="clear-inputs-flag", component_property="data", allow_duplicate=True),
+        Input(component_id="clear-inputs-button", component_property="n_clicks"),
+        prevent_initial_call=True
+    )
+    def clear_inputs_callback(n_clicks):
+        return 1
+    
+    @app.callback(
+        Output(component_id="new-entries-store", component_property="data", allow_duplicate=True),
+        Output(component_id="clear-inputs-flag", component_property="data", allow_duplicate=True),
+        Input(component_id="add-to-db", component_property="n_clicks"),
+        State(component_id="input-1", component_property="value"),
+        State(component_id="input-2", component_property="value"),
+        State(component_id="input-3", component_property="value"),
+        State(component_id="input-4", component_property="value"),
+        State(component_id="input-5", component_property="value"),
+        State(component_id="input-6", component_property="value"),
+        State(component_id="new-entries-store", component_property="data"),
         prevent_initial_call=True
     )
     def add_to_new_entries(n_clicks, input1, input2, input3, input4, input5, input6, new_entries_store):
         if not all([input1, input2, input3, input4, input5, input6]):
-            return no_update
+            return no_update, no_update
 
         new_entry = {
             "id": None,
@@ -75,13 +87,15 @@ def register_callbacks(app):
             new_entries_store = []
 
         new_entries_store.append(new_entry)
-        return new_entries_store
+        
+        clear_inputs_flag = 1
+        return new_entries_store, clear_inputs_flag
     
     @app.callback(
-        Output("database-store", "data", allow_duplicate=True),
-        Output("new-entries-store", "data", allow_duplicate=True),
-        Input("commit-changes", "n_clicks"),
-        State("new-entries-store", "data"),
+        Output(component_id="database-store", component_property="data", allow_duplicate=True),
+        Output(component_id="new-entries-store", component_property="data", allow_duplicate=True),
+        Input(component_id="commit-changes", component_property="n_clicks"),
+        State(component_id="new-entries-store", component_property="data"),
         prevent_initial_call=True
     )
     def commit_changes(n_clicks, new_entries_store):
@@ -97,8 +111,8 @@ def register_callbacks(app):
         return database_store, new_entries_store
     
     @app.callback(
-        Output("new-entries-store", "data"),
-        Input("clear-changes", "n_clicks"),
+        Output(component_id="new-entries-store", component_property="data"),
+        Input(component_id="clear-changes-button", component_property="n_clicks"),
         prevent_initial_call=True
     )
     def clear_changes(n_clicks):

@@ -37,10 +37,11 @@ def serve_layout():
                     dbc.Row(html.Label("Input 6")),
                     dbc.Row(dcc.Input(id="input-6", type="text", value="", placeholder="Enter input 6", debounce=True)),
                 ]),
+                dcc.Store(id="clear-inputs-flag", data=0, storage_type="session"),
             ]),
             dbc.Row([
                 dbc.Button("Add to Database", id="add-to-db", color="primary", n_clicks=0),
-                dbc.Button("Clear Inputs", id="clear-inputs", color="secondary", n_clicks=0),
+                dbc.Button("Clear Inputs", id="clear-inputs-button", color="secondary", n_clicks=0),
             ]),
         ]),
         dbc.Container([
@@ -62,7 +63,7 @@ def serve_layout():
             dcc.Store(id="new-entries-store", data=[], storage_type="session"),
             dbc.Row([
                 dbc.Button("Commit Changes", id="commit-changes", color="primary", n_clicks=0),
-                dbc.Button("Clear Changes", id="clear-changes", color="secondary", n_clicks=0),
+                dbc.Button("Clear Changes", id="clear-changes-button", color="secondary", n_clicks=0),
             ]),
         ]),
     ]
