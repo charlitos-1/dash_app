@@ -16,7 +16,7 @@ def serve_dash_grid_options():
         "animateRows": True,
         "pagination": True,
         "paginationPageSize": 50,
-        "paginationPageSizeSelector": False,
+        "paginationPageSizeSelector": True,
         "tooltipShowDelay": 100,
     }
     return grid_options
