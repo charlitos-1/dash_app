@@ -28,6 +28,7 @@ def serve_column_defs(columns):
             "minWidth": column_sizes.get(column, {}).get("minWidth", 100),
             "maxWidth": column_sizes.get(column, {}).get("maxWidth", 500),
             "filter": True,
+            "sortable": False,
         }
         for idx, column in enumerate(columns)
     ]

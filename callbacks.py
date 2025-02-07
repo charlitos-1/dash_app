@@ -81,6 +81,7 @@ def register_callbacks(app):
             "Input4": input4,
             "Input5": input5,
             "Input6": input6,
+            "Status": "New",
         }
         
         if new_entries_store is None:
@@ -96,27 +97,36 @@ def register_callbacks(app):
         Output(component_id="new-entries-store", component_property="data", allow_duplicate=True),
         Input(component_id="commit-changes", component_property="n_clicks"),
         State(component_id="new-entries-store", component_property="data"),
+        State(component_id="new-entries-table", component_property="selectedRows"),
         prevent_initial_call=True
     )
-    def commit_changes(n_clicks, new_entries_store):
-        if not new_entries_store:
-            return no_update
-
-        for entry in new_entries_store:
-            database.add_row(entry)
+    def commit_changes(n_clicks, new_entries_store, selected_rows):
+        if not selected_rows:
+            return no_update, no_update
         
-        database_store = []
-        new_entries_store = []
-
+        for entry in selected_rows:
+            database.add_row(entry)
+            new_entries_store.remove(entry)
+        
+        database_store = [] # dummy list to trigger the database-store callback
+        
         return database_store, new_entries_store
     
     @app.callback(
         Output(component_id="new-entries-store", component_property="data"),
         Input(component_id="clear-changes-button", component_property="n_clicks"),
+        State(component_id="new-entries-store", component_property="data"),
+        State(component_id="new-entries-table", component_property="selectedRows"),
         prevent_initial_call=True
     )
-    def clear_changes(n_clicks):
-        return []
+    def clear_changes(n_clicks, new_entries_store, selected_rows):
+        if not selected_rows:
+            return no_update
+        
+        for entry in selected_rows:
+            new_entries_store.remove(entry)
+        
+        return new_entries_store
     
     @app.callback(
         Output(component_id="dummy-div", component_property="children", allow_duplicate=True),
