@@ -9,7 +9,7 @@ callbacks.register_callbacks(app)
 
 def main():
     database.initialize_database()
-    app.run_server(debug=False, port=5000)
+    app.run_server(debug=True, port=5000)
 
 
 if __name__ == '__main__':

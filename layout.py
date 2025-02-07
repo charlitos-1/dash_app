@@ -5,7 +5,32 @@ import database
 
 
 def serve_column_defs(columns):
-    column_defs = [{"field": column, "headerTooltip": column, "tooltipField": column} for column in columns]
+    column_sizes = {
+        "id": {"width": 25, "minWidth": 100, "maxWidth": 500},
+        "Input1": {"width": 100, "minWidth": 100, "maxWidth": 500},
+        "Input2": {"width": 100, "minWidth": 100, "maxWidth": 500},
+        "Input3": {"width": 100, "minWidth": 100, "maxWidth": 500},
+        "Input4": {"width": 100, "minWidth": 100, "maxWidth": 500},
+        "Input5": {"width": 100, "minWidth": 100, "maxWidth": 500},
+        "Input6": {"width": 100, "minWidth": 100, "maxWidth": 500},
+        "Status": {"width": 100, "minWidth": 100, "maxWidth": 500},
+    }
+    
+    column_defs = [
+        {
+            "field": column, 
+            "headerTooltip": column, 
+            "tooltipField": column,
+            "headerCheckboxSelection": True if idx == 0 else False,
+            "checkboxSelection": True if idx == 0 else False,
+            "headerCheckboxSelectionFilteredOnly": True,
+            "width": column_sizes.get(column, {}).get("width", "auto"),
+            "minWidth": column_sizes.get(column, {}).get("minWidth", 100),
+            "maxWidth": column_sizes.get(column, {}).get("maxWidth", 500),
+            "filter": True,
+        }
+        for idx, column in enumerate(columns)
+    ]
     return column_defs
 
 
@@ -18,6 +43,8 @@ def serve_dash_grid_options():
         "paginationPageSize": 50,
         "paginationPageSizeSelector": True,
         "tooltipShowDelay": 100,
+        "rowSelection": "multiple",
+        "suppressRowClickSelection": True,
     }
     return grid_options
 
