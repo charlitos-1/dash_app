@@ -54,7 +54,7 @@ def initialize_database(db_file=None, table_name=None, columns=None):
     conn.close()
     
     for column in columns[1:]:
-        if column not in get_columns(db_file, table_name):
+        if column not in get_column_names(db_file, table_name):
             add_column(column, db_file, table_name)
 
 
@@ -77,7 +77,7 @@ def add_row(row_data, db_file=None, table_name=None):
     
     
 def delete_row(row_id, db_file=None, table_name=None):
-    """Deletes a single row from the specified table."""
+    """Deletes a single row from the specified table. WARNING: Don't use this function unless you know what you're doing."""
     if db_file is None:
         db_file = taperunner_db
 
@@ -106,7 +106,7 @@ def add_column(column_name, db_file=None, table_name=None):
     if table_name is None:
         table_name = taperunner_table_name
         
-    if column_name in get_columns(db_file, table_name):
+    if column_name in get_column_names(db_file, table_name):
         return
 
     conn = get_db_connection(db_file)
@@ -118,14 +118,17 @@ def add_column(column_name, db_file=None, table_name=None):
     
     
 def delete_column(column_name, db_file=None, table_name=None):
-    """Deletes a single column from the specified table."""
+    """Deletes a single column from the specified table. WARNING: Don't use this function unless you know what you're doing."""
     if db_file is None:
         db_file = taperunner_db
 
     if table_name is None:
         table_name = taperunner_table_name
         
-    if column_name not in get_columns(db_file, table_name):
+    if column_name not in get_column_names(db_file, table_name):
+        return
+    
+    if is_primary_key(column_name, db_file, table_name):
         return
 
     conn = get_db_connection(db_file)
@@ -134,6 +137,105 @@ def delete_column(column_name, db_file=None, table_name=None):
     cursor.execute(query)
     conn.commit()
     conn.close()
+    
+    
+def refactor_columns(columns=None):
+    """Refactors the columns of the table. WARNING: Don't use this function unless you know what you're doing."""
+    if columns is None:
+        columns = taperunner_columns
+        
+    for column in columns:
+        if column not in get_column_names():
+            add_column(column)
+            
+    for column in get_column_names():
+        if is_primary_key(column):
+            continue
+        if column not in columns:
+            delete_column(column)
+
+    return [column.replace(" ", "") for column in columns]
+
+
+def edit_cell(row_id, column_name, new_value, db_file=None, table_name=None):
+    """Edits a single cell in the specified table."""
+    if db_file is None:
+        db_file = taperunner_db
+
+    if table_name is None:
+        table_name = taperunner_table_name
+
+    if column_name not in get_column_names(db_file, table_name):
+        return
+
+    conn = get_db_connection(db_file)
+    cursor = conn.cursor()
+    query = f"UPDATE {table_name} SET {column_name} = ? WHERE id = ?"
+    cursor.execute(query, (new_value, row_id))
+    conn.commit()
+    conn.close()
+    
+    
+def edit_row(row_id, new_row_data, db_file=None, table_name=None):
+    """Edits a single row in the specified table."""
+    if db_file is None:
+        db_file = taperunner_db
+
+    if table_name is None:
+        table_name = taperunner_table_name
+
+    conn = get_db_connection(db_file)
+    cursor = conn.cursor()
+    columns = new_row_data.keys()
+    query = f"UPDATE {table_name} SET {', '.join([f'{column} = ?' for column in columns])} WHERE id = ?"
+    cursor.execute(query, tuple(new_row_data.values()) + (row_id,))
+    conn.commit()
+    conn.close()
+    
+    
+def get_row(row_id, db_file=None, table_name=None):
+    """Returns a single row as a dictionary."""
+    if db_file is None:
+        db_file = taperunner_db
+
+    if table_name is None:
+        table_name = taperunner_table_name
+
+    conn = get_db_connection(db_file)
+    query = f"SELECT * FROM {table_name} WHERE id = ?"
+    row = pd.read_sql_query(query, conn, params=(row_id,)).to_dict("records")[0]
+    conn.close()
+    return row
+
+
+def get_column(column_name, db_file=None, table_name=None):
+    """Returns a single column as a pandas Series."""
+    if db_file is None:
+        db_file = taperunner_db
+
+    if table_name is None:
+        table_name = taperunner_table_name
+
+    conn = get_db_connection(db_file)
+    query = f"SELECT {column_name} FROM {table_name}"
+    series = pd.read_sql_query(query, conn)[column_name]
+    conn.close()
+    return series
+
+
+def get_column(column_name, db_file=None, table_name=None):
+    """Returns a single column as a pandas Series with the id as the index."""
+    if db_file is None:
+        db_file = taperunner_db
+
+    if table_name is None:
+        table_name = taperunner_table_name
+
+    conn = get_db_connection(db_file)
+    query = f"SELECT id, {column_name} FROM {table_name}"
+    series = pd.read_sql_query(query, conn, index_col="id")[column_name]
+    conn.close()
+    return series
 
 
 def get_table_as_df(db_file=None, table_name=None):
@@ -151,7 +253,23 @@ def get_table_as_df(db_file=None, table_name=None):
     return df
 
 
-def get_columns(db_file=None, table_name=None):
+def is_primary_key(column_name, db_file=None, table_name=None):
+    """Returns whether the specified column is a primary key."""
+    if db_file is None:
+        db_file = taperunner_db
+
+    if table_name is None:
+        table_name = taperunner_table_name
+
+    conn = get_db_connection(db_file)
+    cursor = conn.cursor()
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    columns = cursor.fetchall()
+    conn.close()
+    return column_name == columns[0][1]
+
+
+def get_column_names(db_file=None, table_name=None):
     """Returns the columns of the specified table."""
     if db_file is None:
         db_file = taperunner_db
@@ -165,3 +283,7 @@ def get_columns(db_file=None, table_name=None):
     columns = [column[1] for column in cursor.fetchall()]
     conn.close()
     return columns
+
+
+if __name__ == "__main__":
+    print(get_column("Input1"))

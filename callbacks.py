@@ -16,7 +16,7 @@ def register_callbacks(app):
     def refresh_database_table(database_store):
         database_store = database.get_table_as_df().to_dict("records")
         row_data = [_ for _ in database_store]
-        column_defs = layout.serve_column_defs(database.get_columns())
+        column_defs = layout.serve_column_defs(database.get_column_names())
         
         return row_data, column_defs, database_store
 
@@ -29,7 +29,7 @@ def register_callbacks(app):
     )
     def refresh_new_entries_table(new_entries_store):
         row_data = [_ for _ in new_entries_store]
-        column_defs = layout.serve_column_defs(database.get_columns()) 
+        column_defs = layout.serve_column_defs(database.get_column_names()) 
         return row_data, column_defs, new_entries_store
 
     @app.callback(
