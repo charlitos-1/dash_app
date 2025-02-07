@@ -38,20 +38,17 @@ button {
 }
 
 .dash-table-container {
-    padding: 20px !important;
-    max-height: 500px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    max-height: 375px !important;
     overflow-x: auto !important;
     overflow-y: auto !important;
     display: block !important;
 }
 
 .cell-table {
+    border-collapse: collapse !important;
     table-layout: fixed !important;
-}
-
-.cell-table tr th {
-    font-weight: bold !important;
-    white-space: normal !important;
 }
 
 .cell-table tr th, 
@@ -64,6 +61,15 @@ button {
     padding-right: 10px !important;
     overflow: hidden !important;
     border: rgba(100, 100, 100, 25%) solid 1px !important;
+}
+
+.cell-table th {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1 !important;
+    font-weight: bold !important;
+    white-space: normal !important;
+    height: 40px !important;
 }
 
 .cell-table tr td {
