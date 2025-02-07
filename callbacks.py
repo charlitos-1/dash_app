@@ -3,29 +3,34 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 
 import database
-
+import layout
 
 def register_callbacks(app):
     @app.callback(
-        Output(component_id="database-table", component_property="data", allow_duplicate=True),
+        Output(component_id="database-table", component_property="rowData", allow_duplicate=True),
+        Output(component_id="database-table", component_property="columnDefs", allow_duplicate=True),
         Output(component_id="database-store", component_property="data", allow_duplicate=True),
         Input(component_id="database-store", component_property="data"),
         prevent_initial_call="initial_call_duplicate"
     )
     def refresh_database_table(database_store):
         database_store = database.get_table_as_df().to_dict("records")
-        database_table = database_store
-        return database_table, database_store
+        row_data = [_ for _ in database_store]
+        column_defs = layout.serve_column_defs(database.get_columns())
+        
+        return row_data, column_defs, database_store
 
     @app.callback(
-        Output(component_id="new-entries-table", component_property="data", allow_duplicate=True),
+        Output(component_id="new-entries-table", component_property="rowData", allow_duplicate=True),
+        Output(component_id="new-entries-table", component_property="columnDefs", allow_duplicate=True),
         Output(component_id="new-entries-store", component_property="data", allow_duplicate=True),
         Input(component_id="new-entries-store", component_property="data"),
         prevent_initial_call="initial_call_duplicate"
     )
     def refresh_new_entries_table(new_entries_store):
-        new_entries_table = new_entries_store
-        return new_entries_table, new_entries_store
+        row_data = [_ for _ in new_entries_store]
+        column_defs = layout.serve_column_defs(database.get_columns()) 
+        return row_data, column_defs, new_entries_store
 
     @app.callback(
         Output(component_id="input-1", component_property="value", allow_duplicate=True),
@@ -86,8 +91,8 @@ def register_callbacks(app):
         for entry in new_entries_store:
             database.add_row(entry)
         
-        database_store = None
-        new_entries_store = None
+        database_store = []
+        new_entries_store = []
 
         return database_store, new_entries_store
     

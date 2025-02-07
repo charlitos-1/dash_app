@@ -2,5 +2,5 @@ pandas
 numpy
 dash
 dash-bootstrap-components
-dash-table
+dash-ag-grid
 flask

@@ -1,5 +1,13 @@
 from dash import html, dcc, dash_table
 import dash_bootstrap_components as dbc
+import dash_ag_grid as dag
+import database
+
+
+def serve_column_defs(columns):
+    column_defs = [{"field": column} for column in columns]
+    return column_defs
+
 
 def serve_layout():
     layout = [
@@ -40,18 +48,18 @@ def serve_layout():
                 html.H2("Database"),
             ]),
             dbc.Row([
-                dash_table.DataTable(id="database-table", data=None),
+                dag.AgGrid(id="database-table", rowData=None, columnDefs=None),
             ]),
-            dcc.Store(id="database-store", data=None, storage_type="session"),
+            dcc.Store(id="database-store", data=[], storage_type="session"),
         ]),
         dbc.Container([
             dbc.Row([
                 html.H2("New Entries"),
             ]),
             dbc.Row([
-                dash_table.DataTable(id="new-entries-table", data=None),
+                dag.AgGrid(id="new-entries-table", rowData=None, columnDefs=None),
             ]),
-            dcc.Store(id="new-entries-store", data=None, storage_type="session"),
+            dcc.Store(id="new-entries-store", data=[], storage_type="session"),
             dbc.Row([
                 dbc.Button("Commit Changes", id="commit-changes", color="primary", n_clicks=0),
                 dbc.Button("Clear Changes", id="clear-changes", color="secondary", n_clicks=0),

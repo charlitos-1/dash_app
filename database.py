@@ -87,3 +87,19 @@ def get_table_as_df(db_file=None, table_name=None):
     df = pd.read_sql_query(query, conn)
     conn.close()
     return df
+
+
+def get_columns(db_file=None, table_name=None):
+    """Returns the columns of the specified table."""
+    if db_file is None:
+        db_file = taperunner_db
+
+    if table_name is None:
+        table_name = taperunner_table_name
+
+    conn = get_db_connection(db_file)
+    cursor = conn.cursor()
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    columns = [column[1] for column in cursor.fetchall()]
+    conn.close()
+    return columns
