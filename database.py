@@ -253,6 +253,21 @@ def get_table_as_df(db_file=None, table_name=None):
     return df
 
 
+def get_table_as_list(db_file=None, table_name=None):
+    """Returns the specified table as a list of dictionaries."""
+    if db_file is None:
+        db_file = taperunner_db
+
+    if table_name is None:
+        table_name = taperunner_table_name
+
+    conn = get_db_connection(db_file)
+    query = f"SELECT * FROM {table_name}"
+    table = pd.read_sql_query(query, conn).to_dict("records")
+    conn.close()
+    return table
+
+
 def is_primary_key(column_name, db_file=None, table_name=None):
     """Returns whether the specified column is a primary key."""
     if db_file is None:
