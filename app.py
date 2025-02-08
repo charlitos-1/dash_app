@@ -12,5 +12,5 @@ def main():
     app.run_server(debug=False, port=5000)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
