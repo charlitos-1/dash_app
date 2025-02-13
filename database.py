@@ -1,6 +1,6 @@
 import sqlite3
 import pandas as pd
-import os
+import re
 
 taperunner_db = "taperunner.db"
 taperunner_table_name = "taperunner"
@@ -13,6 +13,11 @@ taperunner_columns = [
     "Input6",
     "Status",
 ]
+
+
+def sql_string_validator(input_string):
+    if not re.match(r"^[a-zA-Z0-9_,\s]*$", input_string):
+        raise ValueError("String must only contain letters, numbers, commas, and spaces.")
 
 
 def get_dummy_df(rows=1, columns=1, header_text="Empty", cell_text="No data"):
@@ -34,6 +39,8 @@ def initialize_database(db_file=None, table_name=None, columns=None):
 
     if table_name is None:
         table_name = taperunner_table_name
+        
+    sql_string_validator(table_name)
 
     if columns is None:
         columns = [column for column in taperunner_columns]
@@ -65,6 +72,8 @@ def add_row(row_data, db_file=None, table_name=None):
 
     if table_name is None:
         table_name = taperunner_table_name
+        
+    sql_string_validator(table_name)
 
     conn = get_db_connection(db_file)
     cursor = conn.cursor()
@@ -83,6 +92,8 @@ def delete_row(row_id, db_file=None, table_name=None):
 
     if table_name is None:
         table_name = taperunner_table_name
+        
+    sql_string_validator(table_name)
         
     if row_id is None:
         return
@@ -106,8 +117,12 @@ def add_column(column_name, db_file=None, table_name=None):
     if table_name is None:
         table_name = taperunner_table_name
         
+    sql_string_validator(table_name)
+        
     if column_name in get_column_names(db_file, table_name):
         return
+    
+    sql_string_validator(column_name)
 
     conn = get_db_connection(db_file)
     cursor = conn.cursor()
@@ -125,11 +140,15 @@ def delete_column(column_name, db_file=None, table_name=None):
     if table_name is None:
         table_name = taperunner_table_name
         
+    sql_string_validator(table_name)
+        
     if column_name not in get_column_names(db_file, table_name):
         return
     
     if is_primary_key(column_name, db_file, table_name):
         return
+    
+    sql_string_validator(column_name)
 
     conn = get_db_connection(db_file)
     cursor = conn.cursor()
@@ -139,20 +158,30 @@ def delete_column(column_name, db_file=None, table_name=None):
     conn.close()
     
     
-def refactor_columns(columns=None):
+def refactor_columns(columns=None, db_file=None, table_name=None):
     """Refactors the columns of the table. WARNING: Don't use this function unless you know what you're doing."""
+    if db_file is None:
+        db_file = taperunner_db
+
+    if table_name is None:
+        table_name = taperunner_table_name
+
+    sql_string_validator(table_name)
+
     if columns is None:
         columns = taperunner_columns
         
     for column in columns:
+        sql_string_validator(column)
         if column not in get_column_names():
-            add_column(column)
+            add_column(column, db_file=db_file, table_name=table_name)
             
     for column in get_column_names():
-        if is_primary_key(column):
+        sql_string_validator(column)
+        if is_primary_key(column, db_file=db_file, table_name=table_name):
             continue
         if column not in columns:
-            delete_column(column)
+            delete_column(column, db_file=db_file, table_name=table_name)
 
     return [column.replace(" ", "") for column in columns]
 
@@ -164,9 +193,13 @@ def edit_cell(row_id, column_name, new_value, db_file=None, table_name=None):
 
     if table_name is None:
         table_name = taperunner_table_name
+        
+    sql_string_validator(table_name)
 
     if column_name not in get_column_names(db_file, table_name):
         return
+    
+    sql_string_validator(column_name)
 
     conn = get_db_connection(db_file)
     cursor = conn.cursor()
@@ -183,6 +216,8 @@ def edit_row(row_id, new_row_data, db_file=None, table_name=None):
 
     if table_name is None:
         table_name = taperunner_table_name
+        
+    sql_string_validator(table_name)
 
     conn = get_db_connection(db_file)
     cursor = conn.cursor()
@@ -200,6 +235,8 @@ def get_row(row_id, db_file=None, table_name=None):
 
     if table_name is None:
         table_name = taperunner_table_name
+        
+    sql_string_validator(table_name)
 
     conn = get_db_connection(db_file)
     query = f"SELECT * FROM {table_name} WHERE id = ?"
@@ -209,27 +246,19 @@ def get_row(row_id, db_file=None, table_name=None):
 
 
 def get_column(column_name, db_file=None, table_name=None):
-    """Returns a single column as a pandas Series."""
-    if db_file is None:
-        db_file = taperunner_db
-
-    if table_name is None:
-        table_name = taperunner_table_name
-
-    conn = get_db_connection(db_file)
-    query = f"SELECT {column_name} FROM {table_name}"
-    series = pd.read_sql_query(query, conn)[column_name]
-    conn.close()
-    return series
-
-
-def get_column(column_name, db_file=None, table_name=None):
     """Returns a single column as a pandas Series with the id as the index."""
     if db_file is None:
         db_file = taperunner_db
 
     if table_name is None:
         table_name = taperunner_table_name
+        
+    sql_string_validator(table_name)
+        
+    if column_name not in get_column_names(db_file, table_name):
+        return pd.Series()
+    
+    sql_string_validator(column_name)
 
     conn = get_db_connection(db_file)
     query = f"SELECT id, {column_name} FROM {table_name}"
@@ -245,6 +274,8 @@ def get_table_as_df(db_file=None, table_name=None):
 
     if table_name is None:
         table_name = taperunner_table_name
+        
+    sql_string_validator(table_name)
 
     conn = get_db_connection(db_file)
     query = f"SELECT * FROM {table_name}"
@@ -260,6 +291,8 @@ def get_table_as_list(db_file=None, table_name=None):
 
     if table_name is None:
         table_name = taperunner_table_name
+        
+    sql_string_validator(table_name)
 
     conn = get_db_connection(db_file)
     query = f"SELECT * FROM {table_name}"
@@ -275,6 +308,8 @@ def is_primary_key(column_name, db_file=None, table_name=None):
 
     if table_name is None:
         table_name = taperunner_table_name
+        
+    sql_string_validator(table_name)
 
     conn = get_db_connection(db_file)
     cursor = conn.cursor()
@@ -291,6 +326,8 @@ def get_column_names(db_file=None, table_name=None):
 
     if table_name is None:
         table_name = taperunner_table_name
+        
+    sql_string_validator(table_name)
 
     conn = get_db_connection(db_file)
     cursor = conn.cursor()
